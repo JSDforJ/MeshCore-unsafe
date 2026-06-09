@@ -96,6 +96,7 @@ class HomeScreen : public UIScreen {
 #if UI_SENSORS_PAGE == 1
     SENSORS,
 #endif
+    OPTIONS,
     SHUTDOWN,
     Count    // keep as last
   };
@@ -108,8 +109,7 @@ class HomeScreen : public UIScreen {
   bool _shutdown_init;
   AdvertPath recent[UI_RECENT_LIST_SIZE];
 
-
-  void renderBatteryIndicator(DisplayDriver& display, uint16_t batteryMilliVolts) {
+  int getBatteryPercentage(uint16_t batteryMilliVolts) {
     // Convert millivolts to percentage
 #ifndef BATT_MIN_MILLIVOLTS
   #define BATT_MIN_MILLIVOLTS 3000
@@ -122,7 +122,11 @@ class HomeScreen : public UIScreen {
     int batteryPercentage = ((batteryMilliVolts - minMilliVolts) * 100) / (maxMilliVolts - minMilliVolts);
     if (batteryPercentage < 0) batteryPercentage = 0; // Clamp to 0%
     if (batteryPercentage > 100) batteryPercentage = 100; // Clamp to 100%
+    return batteryPercentage;
+  }
 
+
+  void renderBatteryIndicator(DisplayDriver& display, uint16_t batteryMilliVolts) {
     // battery icon
     int iconWidth = 24;
     int iconHeight = 10;
@@ -137,7 +141,7 @@ class HomeScreen : public UIScreen {
     display.fillRect(iconX + iconWidth, iconY + (iconHeight / 4), 3, iconHeight / 2);
 
     // fill the battery based on the percentage
-    int fillWidth = (batteryPercentage * (iconWidth - 4)) / 100;
+    int fillWidth = (getBatteryPercentage(batteryMilliVolts) * (iconWidth - 4)) / 100;
     display.fillRect(iconX + 2, iconY + 2, fillWidth, iconHeight - 4);
 
     // show muted icon if buzzer is muted
@@ -273,7 +277,7 @@ public:
 
       // tx power,  noise floor
       display.setCursor(0, 42);
-      sprintf(tmp, "TX: %ddBm", _node_prefs->tx_power_dbm);
+      sprintf(tmp, "TX: %ddBm     BAT: %d%%", _node_prefs->tx_power_dbm, getBatteryPercentage(_task->getBattMilliVolts()));
       display.print(tmp);
       display.setCursor(0, 53);
       sprintf(tmp, "Noise floor: %d", radio_driver.getNoiseFloor());
