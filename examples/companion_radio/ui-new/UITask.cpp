@@ -277,7 +277,7 @@ public:
 
       // tx power,  noise floor
       display.setCursor(0, 42);
-      sprintf(tmp, "TX: %ddBm     BAT: %d%%", _node_prefs->tx_power_dbm, getBatteryPercentage(_task->getBattMilliVolts()));
+      sprintf(tmp, "TX: %ddBm     BAT:%d%%", _node_prefs->tx_power_dbm, getBatteryPercentage(_task->getBattMilliVolts()));
       display.print(tmp);
       display.setCursor(0, 53);
       sprintf(tmp, "Noise floor: %d", radio_driver.getNoiseFloor());
