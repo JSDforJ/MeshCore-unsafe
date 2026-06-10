@@ -6,6 +6,8 @@ permissions:
 on:
   workflow_dispatch:
   push:
+    tags:
+      - 'companion-*'
 
 jobs:
 
@@ -17,7 +19,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Build Environment
-        uses: ./.ShitHub/actions/setup-build-environment
+        uses: ./.github/actions/setup-build-environment
 
       - name: Build Firmwares
         env:
